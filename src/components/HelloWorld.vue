@@ -1,10 +1,10 @@
 <template>
-
-  <div>
+  <div id="app2">
     <form >
     <h2 v-if="pass_right === 'true'">User: {{user}}</h2>
     <h2 v-if="pass_right === 'true'">Department: {{departnment}}</h2>
-<label0 v-if="pass_right === 'false'">
+
+<label v-if="pass_right === 'false'">
 <input v-if="pass_right === 'false'" type= "text" v-model="user" placeholder="Enter user name" size = "25">
 <br><br>
 <input  v-if="pass_right === 'false'" type= "password" v-model="pass" placeholder="Enter password" autocomplete="off" size = "25">
@@ -12,11 +12,13 @@
 <button v-if="pass_right === 'false'" @click= "checkpassword(1)" type = "button">
      Log in
 </button><br><br>
-</label0>
-<button v-if="pass_right === 'true'" type = "button" onClick="window.location.href='https://clock-system-6a6f8.web.app/#/';">
+</label>
+<a id='gits' href= "" @click="gitsadd()">link 1</a><br><br>
+<input v-if="pass_right === 'true' && departnment ==='Customer and technical support'" type= "url" placeholder="Enter git link"><br><br>
+<button style="atl" v-if="pass_right === 'true'" type = "button" onClick = "window.location.href='https://clock-system-6a6f8.web.app/#/';">
 Clocking management
 </button>
-<input type="file" placeholder="Enter git link">
+
      </form>
   </div>
 </template>
@@ -25,6 +27,7 @@ import MD5 from '../../node_modules/md5'
 export default {
   data () {
     return {
+      linksGit: 'https://github.com/KabeloMakganye/pg-promise-js-app_',
       departnment: 'empty',
       gtemail: 0,
       searchemail: '@eafricatelecoms.co.za',
@@ -82,6 +85,9 @@ export default {
     }
   },
   methods: {
+    gitsadd () {
+      document.getElementById('gits').href = this.linksGit
+    },
     async viewemployees (i) {
       await fetch(`https://warm-springs-22910.herokuapp.com/getall_workers`)
         .then(response => response.json())
@@ -245,6 +251,10 @@ export default {
 </style>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+#atl{
+  font-weight: normal;
+  text-align: right;
+}
 h1{
   font-weight: normal;
   text-align: right;
@@ -263,6 +273,10 @@ li {
   margin: 0 10px;
 }
 a {
-  color: #42b983;
+  color: #b94242;
+}
+label {
+   font-weight: normal;
+  text-align: right;
 }
 </style>
