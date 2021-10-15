@@ -1,23 +1,34 @@
 <template>
   <div id="app2">
     <form >
-    <h2 v-if="pass_right === 'true'">User: {{user}}</h2>
-    <h2 v-if="pass_right === 'true'">Department: {{departnment}}</h2>
-
-<label v-if="pass_right === 'false'">
-<input v-if="pass_right === 'false'" type= "text" v-model="user" placeholder="Enter user name" size = "25">
-<br><br>
-<input  v-if="pass_right === 'false'" type= "password" v-model="pass" placeholder="Enter password" autocomplete="off" size = "25">
-<br><br>
-<button v-if="pass_right === 'false'" @click= "checkpassword(1)" type = "button">
-     Log in
-</button><br><br>
-</label>
-<a id='gits' href= "" @click="gitsadd()">link 1</a><br><br>
-<input v-if="pass_right === 'true' && departnment ==='Customer and technical support'" type= "url" placeholder="Enter git link"><br><br>
-<button style="atl" v-if="pass_right === 'true'" type = "button" onClick = "window.location.href='https://clock-system-6a6f8.web.app/#/';">
-Clocking management
-</button>
+    <div v-if="pass_right === 'true'" class="topnav">
+      <label id="userid" class="active" title="" @mouseenter="hov()">User: {{user}}</label>
+      <label class="ab">Department: {{departnment}}</label>
+    </div ><br>
+    <div v-if="pass_right === 'true'">
+      <button class="tablink" @click="openPage('btn1','Codes','#b94242;')" id="btn1">Codes</button>
+      <button class="tablink" @click="openPage('btn2','Addcode','#b94242')" id="btn2">Add code</button>
+      <button class="tablink" type = "button" onClick ="window.location.href='https://clock-system-6a6f8.web.app/#/';" id="btn3">Clocking system</button>
+      <div id="Codes" class="tabcontent">
+        <label v-for="n in linksGitSize" :key= "n">
+          <a id="t" title="t" href= "" @mouseenter = "gitsadd(n)">{{linksGit[n-1].programs_}}</a><br>
+        </label>
+      </div>
+      <div id="Addcode" class="tabcontent">
+        <label>Still under construction</label>
+      </div>
+    </div>
+<div v-if="pass_right === 'false'" id="app">
+  <label>User name:   </label>
+  <input type= "text" v-model="user" placeholder="Enter user name" size = "25">
+  <br><br>
+  <label>Password:    </label>
+  <input type= "password" v-model="pass" placeholder="Enter password" autocomplete="off" size = "25">
+  <br><br>
+  <button @click= "checkpassword(1); getgithublinks();" type = "button">
+       Log in
+  </button><br><br>
+</div>
 
      </form>
   </div>
@@ -27,7 +38,9 @@ import MD5 from '../../node_modules/md5'
 export default {
   data () {
     return {
-      linksGit: 'https://github.com/KabeloMakganye/pg-promise-js-app_',
+      runCount: 0,
+      linksGit: [],
+      linksGitSize: 0,
       departnment: 'empty',
       gtemail: 0,
       searchemail: '@eafricatelecoms.co.za',
@@ -85,8 +98,44 @@ export default {
     }
   },
   methods: {
-    gitsadd () {
-      document.getElementById('gits').href = this.linksGit
+    async getgithublinks () {
+      await fetch(`https://warm-springs-22910.herokuapp.com/fn_get_gitlink/`)
+        .then(response => response.json())
+        .then(results => (this.linksGit = results))
+      this.linksGitSize = this.linksGit.length
+      console.log('links opened' + this.linksGit.length)
+    },
+    openPage (btn, pageName, color) {
+      // Hide all elements with class="tabcontent" by default */
+      var i, tabcontent, tablinks
+      tabcontent = document.getElementsByClassName('tabcontent')
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = 'none'
+      }
+      // Remove the background color of all tablinks/buttons
+      tablinks = document.getElementsByClassName('tablink')
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].style.backgroundColor = ''
+      }
+      // Show the specific tab content
+      document.getElementById(pageName).style.display = 'block'
+      // Add the specific color to the button used to open the tab content
+      document.getElementById(pageName).style.backgroundColor = '#b94242'
+      document.getElementById(btn).style.backgroundColor = '#b94242'
+    },
+    hov () {
+      document.getElementById('userid').title = this.email
+    },
+    gitsadd (n) {
+      if (this.runCount === 0) {
+        for (let index = 0; index < this.linksGitSize; index++) {
+          document.getElementById('t').title = this.linksGit[index].programs_
+          document.getElementById('t').id = this.linksGit[index].programs_
+          document.getElementById(this.linksGit[index].programs_).href = this.linksGit[n - 1].links_
+          document.getElementById(this.linksGit[index].programs_).style.color = 'white'
+        }
+      }
+      this.runCount++
     },
     async viewemployees (i) {
       await fetch(`https://warm-springs-22910.herokuapp.com/getall_workers`)
@@ -251,6 +300,61 @@ export default {
 </style>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+body, html {
+  height: 100%;
+  margin: 0;
+  font-family: Arial;
+}
+
+/* Style tab links */
+.tablink {
+  background-color: #555;
+  color: white;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  font-size: 17px;
+  width: 25%;
+}
+
+.tablink:hover {
+  background-color: #777;
+}
+
+/* Style the tab content (and add height:100% for full page content) */
+.tabcontent {
+  color: white;
+  display: none;
+  padding: 100px 20px;
+  height: 100%;
+}
+
+#Home {background-color: red;}
+#News {background-color: green;}
+#Contact {background-color: blue;}
+#About {background-color: orange;}
+.topnav {
+  overflow: hidden;
+  background-color: #b94242;
+}
+.topnav label {
+  float: left;
+  color: #ffffff;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+.topnav label.ab {
+  float: right;
+  color: #ffffff;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
 #atl{
   font-weight: normal;
   text-align: right;
@@ -272,11 +376,78 @@ li {
   display: inline-block;
   margin: 0 10px;
 }
-a {
-  color: #b94242;
-}
+
 label {
    font-weight: normal;
   text-align: right;
+}
+a{
+    color: #ffffff;
+}
+
+user agent stylesheet
+a:-webkit-any-link {
+    color: -webkit-link;
+    cursor: pointer;
+    text-decoration: underline;
+}
+ul li {
+    line-height: 24px;
+}
+user agent stylesheet
+li {
+    text-align: -webkit-match-parent;
+}
+
+#js-mainnav.megamenu ul {
+    list-style: outside none none;
+}
+user agent stylesheet
+ul {
+    list-style-type: disc;
+}
+
+#js-mainnav.megamenu .js-megamenu {
+    font-size: 12px;
+    margin: 0px;
+    padding: 0px;
+}
+#js-mainnav.megamenu {
+    line-height: 1;
+    position: relative;
+    z-index: 9;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+}
+body {
+    line-height: 22px;
+}
+body {
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #333;
+    background-color: #fff;
+}
+html {
+    font-size: 10px;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+html {
+    font-family: sans-serif;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+}
+:before, :after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+:before, :after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 </style>
