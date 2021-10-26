@@ -6,26 +6,37 @@
       <label class="ab">Department: {{departnment}}</label>
     </div ><br>
     <div v-if="pass_right === 'true'">
-      <button class="tablink" @click="openPage('btn1','Codes','#b94242;')" id="btn1">Codes</button>
-      <button class="tablink" @click="openPage('btn2','Addcode','#b94242')" id="btn2">Add code</button>
+      <button type="button" class="tablink" @click="openPage('btn1','Coding');getgithublinks();" id="btn1">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAPpJREFUSEu9leERwTAYhh8TsAEmYAQ2YAMmMAI2sAEbsAEjsAEb2IB7Xb+7yDWVSNv+6V3TPs/3fkmTDg1fnYb5tCqYAHtgkJnqDiyBizhuAg30M+H2uVhDX/CqCW6YT/FugtYEuRNvhQYTtC7oAStg683RBtgBT+95UgLBz8C4EAiqS/c1cAWmniRa4MJvgP4Tq1ZjWuejEkmUoApuHQlJogWhCl2Btc9NGCUQpKoNVQmjBb5kDpyK8mfAEfDnRsNJApNogg1uLZJEbcxapv9sT8kJUiVBgaJ2U2mB9x92rrj7jvp8qOFMEHxRduDUVPw3Jnfn/FlU44I3UTdMGRRN8sgAAAAASUVORK5CYII="/>
+        Codes
+      </button>
+      <button type="button" class="tablink" @click="openPage('btn2','Addcode')" id="btn2">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAUlJREFUSEu1lW1Rg0EMhJ8qAAmgAHAACgAHoKA4aHEACsABoAAkgAKQUBTQ2c6lkzlyHz1486+9XHaTzd47Y+KYTVyfUYAD4KuH3AiAin8CH8BxC2QE4Ap4AF6AiykA7oA5cAsspwB4B46AM+DtLwCa73li6uv8pB82XnXxDAj4V5Q00Gw1533gMhXQ5VPg1QmsvCdgBVy7vC1QBCBGi5QhISWqCijs7B64SQQeU6d2Lm1CALEVa9uMSESNQmMTWxW28KSUo/MNKd+BifedWCsxD13aAw4Do4mYQHWuWiclgNI8zWAioG7z8LptTeg70KXaPGsGK+rWEtnPMzJYU7famto8bU0jg9maFnWrvUUymgrYc5AbzG/QzkbLBcwNFpk2/K/3Nc0N9u8AJYM1gXo7MIEjg1VBegFUpPszWXqLmu2OJOzSwUh91gWwUhn6WvIWAAAAAElFTkSuQmCC"/>
+        Add code</button>
       <button class="tablink" type = "button" onClick ="window.location.href='https://clock-system-6a6f8.web.app/#/';" id="btn3">Clocking system</button>
-      <div id="Codes" class="tabcontent">
-        <label v-for="n in linksGitSize" :key= "n">
-          <a id="t" title="t" href= "" @mouseenter = "gitsadd(n)">{{linksGit[n-1].programs_}}</a><br>
+      <div id="Coding" class="tabcontent">
+        <label class="abc" v-for="n in linksGitSize" :key= "n">
+          <a id="t" title="t" href= "" @mouseenter = "gitsadd(n)" target="_blank">{{linksGit[n-1].programs_}}</a><br><br>
         </label>
       </div>
       <div id="Addcode" class="tabcontent">
-        <label>Still under construction</label>
+        <label>Enter program name</label><br>
+        <input type="text" v-model="programName" size="25"><br>
+        <label>Enter git link</label><br>
+        <input type="text" v-model="urlLink" size="25"><br>
+        <button @click="submitLink()" type="button">
+          Upload
+        </button>
       </div>
     </div>
 <div v-if="pass_right === 'false'" id="app">
   <label>User name:   </label>
-  <input type= "text" v-model="user" placeholder="Enter user name" size = "25">
+  <input type= "text" v-model="user" @mouseenter= "getgithublinks()" placeholder="Enter user name" size = "25">
   <br><br>
   <label>Password:    </label>
   <input type= "password" v-model="pass" placeholder="Enter password" autocomplete="off" size = "25">
   <br><br>
-  <button @click= "checkpassword(1); getgithublinks();" type = "button">
+  <button @click= "checkpassword(1)" type = "button">
        Log in
   </button><br><br>
 </div>
@@ -38,6 +49,8 @@ import MD5 from '../../node_modules/md5'
 export default {
   data () {
     return {
+      programName: '',
+      urlLink: '',
       runCount: 0,
       linksGit: [],
       linksGitSize: 0,
@@ -98,14 +111,18 @@ export default {
     }
   },
   methods: {
-    async getgithublinks () {
-      await fetch(`https://warm-springs-22910.herokuapp.com/fn_get_gitlink/`)
-        .then(response => response.json())
-        .then(results => (this.linksGit = results))
-      this.linksGitSize = this.linksGit.length
-      console.log('links opened' + this.linksGit.length)
+    async submitLink () {
+      var prName = this.programName
+      var urlLin = this.urlLink.replace(/\//g, '_uo')
+      try {
+        await fetch(`https://warm-springs-22910.herokuapp.com/fn_add_new_github/${prName}/${urlLin}/${this.email}`)
+      } catch (error) {
+        alert('Link already uploaded')
+      }
+      this.programName = ''
+      this.urlLink = ''
     },
-    openPage (btn, pageName, color) {
+    openPage (btn, pageName) {
       // Hide all elements with class="tabcontent" by default */
       var i, tabcontent, tablinks
       tabcontent = document.getElementsByClassName('tabcontent')
@@ -126,16 +143,28 @@ export default {
     hov () {
       document.getElementById('userid').title = this.email
     },
-    gitsadd (n) {
-      if (this.runCount === 0) {
-        for (let index = 0; index < this.linksGitSize; index++) {
-          document.getElementById('t').title = this.linksGit[index].programs_
-          document.getElementById('t').id = this.linksGit[index].programs_
-          document.getElementById(this.linksGit[index].programs_).href = this.linksGit[n - 1].links_
-          document.getElementById(this.linksGit[index].programs_).style.color = 'white'
+    async getgithublinks () {
+      await fetch(`https://warm-springs-22910.herokuapp.com/fn_get_gitlink/`)
+        .then(response => response.json())
+        .then(results => (this.linksGit = results))
+      this.linksGitSize = this.linksGit.length
+    },
+    /*
+    *This function add titles,id and href to the dynamically created hyperlinks
+    */
+    async gitsadd (n) {
+      // if (this.runCount !== (this.linksGitSize - 1)) {
+      if (this.linksGit.length > 0) {
+        while (this.runCount !== (this.linksGitSize)) { // for (index = 0; index < this.linksGitSize; index++) {
+          document.getElementById('t').title = `Uploaded by ${this.linksGit[this.runCount].addedby_}`// this.linksGit[this.runCount].links_
+          document.getElementById('t').id = this.linksGit[this.runCount].programs_
+          this.linksGit[this.runCount].links_ = this.linksGit[this.runCount].links_.replace(/_uo/g, '/')
+          document.getElementById(this.linksGit[this.runCount].programs_).href = this.linksGit[this.runCount].links_
+          document.getElementById(this.linksGit[this.runCount].programs_).style.color = 'white'
+          this.runCount++
         }
       }
-      this.runCount++
+      // }
     },
     async viewemployees (i) {
       await fetch(`https://warm-springs-22910.herokuapp.com/getall_workers`)
@@ -203,7 +232,6 @@ export default {
         if (this.user === this.resultsFetched_2[this.i].name_) {
           if (this.cpass === this.resultsFetched_2[this.i].password_ && i === 1) {
             this.pass_right = 'true'
-            // console.log('      pass right     ')
             this.email = this.resultsFetched_2[this.i].email_
             this.departnment = this.resultsFetched_2[this.i].department_
             if (this.resultsFetched_2[this.i].manager_) {
@@ -317,8 +345,11 @@ body, html {
   padding: 14px 16px;
   font-size: 17px;
   width: 25%;
+  align-items: center;
 }
-
+.tablink img {
+  position: relative;
+}
 .tablink:hover {
   background-color: #777;
 }
@@ -329,6 +360,7 @@ body, html {
   display: none;
   padding: 100px 20px;
   height: 100%;
+  text-decoration: none;
 }
 
 #Home {background-color: red;}
